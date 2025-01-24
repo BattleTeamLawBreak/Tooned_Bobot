@@ -1,0 +1,74 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+@TeleOp
+public class Tooned extends LinearOpMode {
+    private DcMotor leftArm;  
+    private DcMotor rightArm; 
+    private double leftArmPower = 0; 
+    private double rightArmPower = 0; 
+
+    @Override
+    public void runOpMode() {
+        leftArm = hardwareMap.get(DcMotor.class, "motor3");
+        rightArm = hardwareMap.get(DcMotor.class, "motor4");
+        
+        leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        
+        leftArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        
+
+        leftArm.setDirection(DcMotor.Direction.FORWARD);
+        rightArm.setDirection(DcMotor.Direction.FORWARD);
+        
+        leftArm.setTargetPosition(200);
+        rightArm.setTargetPosition(200);
+        
+        leftArm.setPower(1);
+        rightArm.setPower(1);
+        
+        leftArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        rightArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        
+        
+        
+       
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            if (gamepad1.left_trigger > .4) {
+                leftArmPower = gamepad1.left_trigger;
+            } else if (gamepad1.left_bumper) {
+                leftArmPower = -0.2;
+            } else {
+                leftArmPower = 0;
+            }
+            leftArm.setPower(leftArmPower); 
+           
+            if (gamepad1.right_trigger > .4) {
+                rightArmPower = gamepad1.right_trigger;
+            } else if (gamepad1.right_bumper) {
+                rightArmPower = -0.2;
+            } else {
+                rightArmPower = 0;
+            }
+            rightArm.setPower(rightArmPower); 
+
+            telemetry.addData("Left Arm Power", leftArmPower);
+            telemetry.addData("Right Arm Power", rightArmPower);
+            telemetry.addData("Left Arm position", leftArm.getCurrentPosition());
+            telemetry.addData("Right Arm position", rightArm.getCurrentPosition());
+            telemetry.update();
+        }
+        
+        leftArm.setPower(0);
+        rightArm.setPower(0);
+    }
+}
