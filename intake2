@@ -1,0 +1,37 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
+
+@TeleOp
+public class Intake2 extends LinearOpMode {
+   Servo servo3 = null;
+
+    @Override
+    public void runOpMode() {
+        // Initialize the servo
+        servo3 = hardwareMap.get(Servo.class, "servo3");
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+        
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+
+        // Run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) {
+            telemetry.addData("Status", "Running");
+            telemetry.update();
+
+            // Logic to control the servo using the gamepad
+            if(gamepad1.b) {
+                // Position for 'b' button press
+                servo3.setPosition(0);
+            } else if (gamepad1.y) {
+                // Position for 'y' button press
+                servo3.setPosition(1);
+            }
+        }
+    }
+}
