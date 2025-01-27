@@ -1,0 +1,80 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+@TeleOp
+public class Tooned extends LinearOpMode {
+    private DcMotor leftArm;  
+    private DcMotor rightArm; 
+    private double leftArmPower = 0; 
+    private double rightArmPower = 0; 
+
+    @Override
+    public void runOpMode() {
+        leftArm = hardwareMap.get(DcMotor.class, "motor3");
+        rightArm = hardwareMap.get(DcMotor.class, "motor4");
+        
+        leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        
+        leftArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        
+
+        leftArm.setDirection(DcMotor.Direction.FORWARD);
+        rightArm.setDirection(DcMotor.Direction.REVERSE);
+        
+        leftArm.setTargetPosition(-35);
+        rightArm.setTargetPosition(-35);
+        
+        leftArm.setPower(.5);
+        rightArm.setPower(.5);
+        
+        leftArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        rightArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        
+        
+        
+       
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+            if (gamepad1.dpad_up) {
+                leftArm.setTargetPosition(-1400);
+                rightArm.setTargetPosition(-1400);
+            
+                leftArm.setPower(.5);
+                rightArm.setPower(.5);
+            
+                leftArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                rightArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+            }
+           
+           
+            if (gamepad1.dpad_down) {
+                leftArm.setTargetPosition(-35);
+                rightArm.setTargetPosition(-35);
+        
+                leftArm.setPower(.5);
+                rightArm.setPower(.5);
+        
+                leftArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                rightArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+            }
+            
+
+            telemetry.addData("Left Arm Power", leftArmPower);
+            telemetry.addData("Right Arm Power", rightArmPower);
+            telemetry.addData("Left Arm position", leftArm.getCurrentPosition());
+            telemetry.addData("Right Arm position", rightArm.getCurrentPosition());
+            telemetry.update();
+        }
+        
+        leftArm.setPower(0);
+        rightArm.setPower(0);
+    }
+}
