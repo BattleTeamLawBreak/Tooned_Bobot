@@ -156,11 +156,11 @@ public class Team3 extends LinearOpMode {
             }
             
             if (gamepad1.right_bumper ||  gamepad2.right_bumper) {
-                leftArm.setTargetPosition(-1700);
-                rightArm.setTargetPosition(-1700);
+                leftArm.setTargetPosition(-490);
+                rightArm.setTargetPosition(-490);
             
-                leftArm.setPower(.5);
-                rightArm.setPower(.5);
+                leftArm.setPower(.4);
+                rightArm.setPower(.4);
             
                 leftArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                 rightArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
