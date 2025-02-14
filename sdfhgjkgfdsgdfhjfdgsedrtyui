@@ -1,0 +1,246 @@
+package org.firstinspires.ftc.teamcode;
+
+
+
+
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+
+@Autonomous(name = "PowerAuton", group = "LinearOpMode")
+public class AUTON2ND extends LinearOpMode {
+    private DcMotor frontLeft, frontRight, backLeft, backRight;
+    private DcMotor leftArm, rightArm;
+    private Servo servo3;  // Wrist
+    private Servo servo2;  // Claw
+    IMU imu;
+
+    @Override
+    public void runOpMode() {
+        // Initialize hardware
+        frontLeft = hardwareMap.get(DcMotor.class, "rearleft");
+        frontRight = hardwareMap.get(DcMotor.class, "rearright");
+        backLeft = hardwareMap.get(DcMotor.class, "frontright");
+        backRight = hardwareMap.get(DcMotor.class, "frontleft");
+        leftArm = hardwareMap.get(DcMotor.class, "motor3");
+        rightArm = hardwareMap.get(DcMotor.class, "motor4");
+        servo3 = hardwareMap.get(Servo.class, "servo3");
+        servo2 = hardwareMap.get(Servo.class, "servo2");
+        imu = hardwareMap.get(IMU.class, "imu");
+
+        
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
+        
+
+
+        // Set motor directions
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
+        leftArm.setDirection(DcMotor.Direction.FORWARD);
+        rightArm.setDirection(DcMotor.Direction.REVERSE);
+
+        // Reset and configure arm encoders
+        leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Set initial servo position
+        servo2.setPosition(.1);  // Claw
+        servo3.setPosition(0.26);  // Wrist
+        
+
+        
+
+
+        telemetry.addData("Status", "Initialized");
+                
+        //telemetry.addData("Hub orientation", "Logo=%s   USB=%s\n ", logoDirection, usbDirection);
+        if (gamepad1.y) {
+                telemetry.addData("Yaw", "Resetting\n");
+                imu.resetYaw();
+            } else {
+            telemetry.addData("Yaw", "Press Y (triangle) on Gamepad to reset\n");
+            //telemetry.addData("Arm", "Moving to position %d", position);
+            telemetry.update();
+        } 
+        
+            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+            AngularVelocity angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
+
+            telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
+            telemetry.addData("Pitch (X)", "%.2f Deg.", orientation.getPitch(AngleUnit.DEGREES));
+            telemetry.addData("Roll (Y)", "%.2f Deg.\n", orientation.getRoll(AngleUnit.DEGREES));
+            telemetry.addData("Yaw (Z) velocity", "%.2f Deg/Sec", angularVelocity.zRotationRate);
+            telemetry.addData("Pitch (X) velocity", "%.2f Deg/Sec", angularVelocity.xRotationRate);
+            telemetry.addData("Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
+            telemetry.update();
+
+            waitForStart();
+
+
+        if (opModeIsActive()) {
+            // Move arm up and hold position
+             moveArmToPosition(-650, 0.5);
+            holdArmPosition();
+            
+            servo3.setPosition(0.6);
+            sleep(500);
+            
+            moveForward(-475, 0.5);//less=higher
+            sleep(400);
+            moveArmToPosition(-450, 0.5);
+            holdArmPosition();
+             servo2.setPosition(0.8);
+            servo3.setPosition(0.6);
+            sleep(500);
+         
+            moveBackward(-245, 0.5);
+          
+
+            // Strafe left (approx 2 feet)
+            strafeLeft(1000, 0.325);  // Adjust tick value as needed
+            sleep(500);
+            // Final arm movement
+            leftArm.setTargetPosition(-1645);//less=lower
+            rightArm.setTargetPosition(-1645);
+            leftArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+            rightArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+            leftArm.setPower(0.5);
+            rightArm.setPower(0.5);
+            sleep(900);
+            moveBackward(-150, 0.5);
+             servo2.setPosition(0.1);
+             sleep(500);
+             leftArm.setTargetPosition(-355);
+            rightArm.setTargetPosition(-355);
+            leftArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+            rightArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+            leftArm.setPower(0.5);
+            rightArm.setPower(0.5);
+            servo3.setPosition(0.3);
+            sleep(500);
+             strafeLeft(-1250, 0.325);
+              sleep(500);
+              moveForward(-450, 0.25);
+              sleep(500);
+               leftArm.setTargetPosition(-460);//less=higher
+               rightArm.setTargetPosition(-460);
+            leftArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+            rightArm.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+            sleep(350);
+            leftArm.setPower(0.5);
+            rightArm.setPower(0.5);
+              sleep(500);
+               moveBackward(-150, 0.5);
+                moveBackward(-150, 0.5);
+                
+                
+                
+                
+                
+        }
+    }
+
+    private void moveForward(int ticks, double power) {
+        setTargetPosition(ticks);
+        setMotorPower(power);
+        waitForMotors();
+    }
+
+    private void moveBackward(int ticks, double power) {
+        setTargetPosition(-ticks);
+        setMotorPower(power);
+        waitForMotors();
+    }
+
+    private void strafeLeft(int ticks, double power) {
+        frontLeft.setTargetPosition(frontLeft.getCurrentPosition() - ticks);
+        frontRight.setTargetPosition(frontRight.getCurrentPosition() + ticks);
+        backLeft.setTargetPosition(backLeft.getCurrentPosition() + ticks);
+        backRight.setTargetPosition(backRight.getCurrentPosition() - ticks);
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        setMotorPower(power);
+        waitForMotors();
+    }
+
+    private void setTargetPosition(int ticks) {
+        frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + ticks);
+        frontRight.setTargetPosition(frontRight.getCurrentPosition() + ticks);
+        backLeft.setTargetPosition(backLeft.getCurrentPosition() + ticks);
+        backRight.setTargetPosition(backRight.getCurrentPosition() + ticks);
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    private void setMotorPower(double power) {
+        frontLeft.setPower(power);
+        frontRight.setPower(power);
+        backLeft.setPower(power);
+        backRight.setPower(power);
+    }
+
+    private void waitForMotors() {
+        while (opModeIsActive() && frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
+            telemetry.addData("Moving", "Motors running...");
+            telemetry.update();
+        }
+        stopMotors();
+    }
+
+    private void stopMotors() {
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+
+    private void moveArmToPosition(int position, double power) {
+        leftArm.setTargetPosition(position);
+        rightArm.setTargetPosition(position);
+        leftArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftArm.setPower(power);
+        rightArm.setPower(power);
+
+        while (opModeIsActive() && leftArm.isBusy() && rightArm.isBusy())  {
+            
+
+        holdArmPosition();
+        
+
+    }
+    }
+
+    private void holdArmPosition() {
+        leftArm.setPower(0.1);
+        rightArm.setPower(0.1);
+    }
+}
